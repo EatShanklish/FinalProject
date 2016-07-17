@@ -5,17 +5,48 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Insert title here</title>
+<title>Jobs and Whatnot</title>
 </head>
 <body>
+<h1>${message}</h1>
+<h2>Jobs from Dice</h2>
 
 <table>
-    <c:forEach items="${array}" var="emps1">
+    <c:forEach items="${array}" var="job">
         <tr>
-            <td><c:out value="${emps1}"/></td>
+            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
+        </tr>
+        <tr>
+            <td><c:out value="${job.company}"/><br></td>
+        </tr>
+        <tr>
+            <td><c:out value="${job.location}"/><br></td>
+        </tr>
+        <tr>
+            <td>--------------------------------------------<br></td>
         </tr>
     </c:forEach>
 </table>
+
+<h1>Jobs from Indeed</h1>
+
+<table>
+    <c:forEach items="${indeedArray}" var="job">
+        <tr>
+            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
+        </tr>
+        <tr>
+            <td><c:out value="${job.company}"/><br></td>
+        </tr>
+        <tr>
+            <td><c:out value="${job.location}"/><br></td>
+        </tr>
+        <tr>
+            <td>--------------------------------------------<br></td>
+        </tr>
+    </c:forEach>
+</table>
+
 
 </body>
 </html>
