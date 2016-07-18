@@ -36,7 +36,7 @@ public class FinalController
 	{
 		
 		ArrayList<job> jobList = diceJobSearch(keyword,location);
-		ArrayList<job> indeedJobList = indeedJobSearch();
+		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);
 		
 		
 		model.addAttribute("array",jobList);
@@ -70,10 +70,11 @@ public class FinalController
 	
 	//Dice Job Parser - Returns ArrayList of Jobs from Dice
 	@RequestMapping("dice")
-	public ArrayList<job> diceJobSearch(String keyword, String location) throws ClientProtocolException, IOException, ParseException
+	public ArrayList<job> diceJobSearch(String pKeyword, String pLocation) throws ClientProtocolException, IOException, ParseException
 
 	{
-		
+		String keyword = pKeyword.replaceAll("\\s","+");
+		String location = pLocation.replaceAll("\\s","+");
 		String url = "http://service.dice.com/api/rest/jobsearch/v1/simple.json?text="+keyword+"&state="+location+"";
 	
 		HttpClient client = HttpClientBuilder.create().build();
@@ -133,9 +134,11 @@ public class FinalController
 	}
 
 	//Indeed Job Parser - Returns ArrayList of Jobs from Indeed
-public ArrayList<job> indeedJobSearch() throws ClientProtocolException, IOException, ParseException
+public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws ClientProtocolException, IOException, ParseException
 {
-	String url = "http://api.indeed.com/ads/apisearch?publisher=2945076701195809&q=java&l=detroit%2C+mi&sort=&radius=&st=&jt=&start=&limit=&fromage=&format=json&filter=&latlong=1&co=us&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0%28Firefox%29&v=2";
+	String keyword = pkeyword.replaceAll("\\s","+");
+	String location = plocation.replaceAll("\\s","+");
+	String url = "http://api.indeed.com/ads/apisearch?publisher=2945076701195809&q="+keyword+"&l="+location+"&format=json&sort=&radius=&st=&jt=&start=&limit=&fromage=&filter=&latlong=1&co=us&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0%28Firefox%29&v=2";
 	
 
 	HttpClient client = HttpClientBuilder.create().build();
