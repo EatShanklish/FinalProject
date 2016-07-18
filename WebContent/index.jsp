@@ -10,7 +10,7 @@
 <h1>Employment Found Here</h1>
 <a href="welcome.html">Find a Job</a>
 
-<form action="dice.html">
+<form action="welcome.html">
   What:<br>
   <input type="text" name="query" placeholder="Enter Search Keyword" method="get"><br>
   Where:<br>

@@ -1,18 +1,23 @@
 package com.Shanklish.Controller;
 
 
+import java.awt.List;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Iterator;
 
 import org.apache.catalina.connector.Request;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,22 +25,23 @@ import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class FinalController 
 {
 	@RequestMapping("/welcome")
-	public ModelAndView helloWorld(Model model) throws ClientProtocolException, IOException, ParseException
+	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("location") String location) throws ClientProtocolException, IOException, ParseException
 	{
 		
-		ArrayList<job> jobList = diceJobSearch();
+		ArrayList<job> jobList = diceJobSearch(keyword,location);
 		ArrayList<job> indeedJobList = indeedJobSearch();
 		
 		
 		model.addAttribute("array",jobList);
 		
-			for(int i =0; i < diceJobSearch().size(); i++)
+			for(int i =0; i < jobList.size(); i++)
 				{
 					
 					model.addAttribute("jobListCompanyName", jobList.get(i).getCompany());
@@ -48,7 +54,7 @@ public class FinalController
 		
 		model.addAttribute("indeedArray", indeedJobList);
 		
-			for(int i=0; i< indeedJobSearch().size();i++)
+			for(int i=0; i< indeedJobList.size();i++)
 				{
 					model.addAttribute("indeedJobTitle",indeedJobList.get(i).getJobTitle());
 					model.addAttribute("indeedCompanyName", indeedJobList.get(i).getCompany());
@@ -64,18 +70,18 @@ public class FinalController
 	
 	//Dice Job Parser - Returns ArrayList of Jobs from Dice
 	@RequestMapping("dice")
-	public ArrayList<job> diceJobSearch() throws ClientProtocolException, IOException, ParseException
+	public ArrayList<job> diceJobSearch(String keyword, String location) throws ClientProtocolException, IOException, ParseException
 
 	{
-		//Request formRequest = new Request();
-		//String query= request.getParameter("query");  //  [TO-DO]: Retrieve user keyword and insert into url below.
 		
-		String url = "http://service.dice.com/api/rest/jobsearch/v1/simple.json?text=java&state=MI";
+		String url = "http://service.dice.com/api/rest/jobsearch/v1/simple.json?text="+keyword+"&state="+location+"";
 	
 		HttpClient client = HttpClientBuilder.create().build();
 		
+		
 		HttpGet request = new HttpGet(url);
-
+		
+		
 		HttpResponse response = client.execute(request);
 		
 		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
@@ -88,6 +94,7 @@ public class FinalController
 			result.append(line);
 		}
 	    
+		System.out.println(result);
 	 
 	    //------------------------------------------
 		
