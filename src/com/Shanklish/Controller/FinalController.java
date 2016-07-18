@@ -28,35 +28,34 @@ public class FinalController
 	@RequestMapping("/welcome")
 	public ModelAndView helloWorld(Model model) throws ClientProtocolException, IOException, ParseException
 	{
-		ArrayList <String> list = new ArrayList<String>();
+		
 		ArrayList<job> jobList = diceJobSearch();
 		ArrayList<job> indeedJobList = indeedJobSearch();
 		
 		
 		model.addAttribute("array",jobList);
 		
-		for(int i =0; i < diceJobSearch().size(); i++)
-		{
+			for(int i =0; i < diceJobSearch().size(); i++)
+				{
+					
+					model.addAttribute("jobListCompanyName", jobList.get(i).getCompany());
+					model.addAttribute("jobListLocation", jobList.get(i).getLocation());	
+					model.addAttribute("jobListjobTitle",jobList.get(i).getJobTitle());
+					model.addAttribute("jobUrl", jobList.get(i).getUrl());
+					
+				}
 			
-			model.addAttribute("jobListCompanyName", jobList.get(i).getCompany());
-			model.addAttribute("jobListLocation", jobList.get(i).getLocation());	
-			model.addAttribute("jobListjobTitle",jobList.get(i).getJobTitle());
-			model.addAttribute("jobUrl", jobList.get(i).getUrl());
-			
-		}
-		
-		
 		
 		model.addAttribute("indeedArray", indeedJobList);
 		
-		for(int i=0; i< indeedJobSearch().size();i++)
-		{
-			model.addAttribute("indeedJobTitle",indeedJobList.get(i).getJobTitle());
-			model.addAttribute("indeedCompanyName", indeedJobList.get(i).getCompany());
-			model.addAttribute("indeedLocation", indeedJobList.get(i).getLocation());
-			model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
-		}
-		
+			for(int i=0; i< indeedJobSearch().size();i++)
+				{
+					model.addAttribute("indeedJobTitle",indeedJobList.get(i).getJobTitle());
+					model.addAttribute("indeedCompanyName", indeedJobList.get(i).getCompany());
+					model.addAttribute("indeedLocation", indeedJobList.get(i).getLocation());
+					model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
+				}
+			
 		
 		
 		return new ModelAndView("welcome","message","JOBS");
@@ -73,12 +72,11 @@ public class FinalController
 		
 		String url = "http://service.dice.com/api/rest/jobsearch/v1/simple.json?text=java&state=MI";
 	
-
 		HttpClient client = HttpClientBuilder.create().build();
+		
 		HttpGet request = new HttpGet(url);
 
 		HttpResponse response = client.execute(request);
-
 		
 		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
@@ -108,7 +106,7 @@ public class FinalController
 		
 		
 		job newjob = null;
-												//TO-DO - Need to make URL print alongside job.
+												
 		while(iterator.hasNext())
 		    {
 				newjob = new job();
