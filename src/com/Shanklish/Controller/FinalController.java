@@ -1,40 +1,99 @@
 package com.Shanklish.Controller;
 
 
-import java.awt.List;
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 
-import org.apache.catalina.connector.Request;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.eclipse.jdt.internal.compiler.ast.ContinueStatement;
-import org.eclipse.jdt.internal.compiler.ast.FalseLiteral;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
 @Controller
 public class FinalController 
 {
+	
+	private static SessionFactory factory;
+
+	private static void setupFactory() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (Exception e) {
+			;//this is silliness!
+		}
+	    
+		 Configuration configuration = new Configuration();
+
+		 // Pass hibernate configuration file
+		 configuration.configure("hibernate.cfg.xml");
+		 
+		 // pass in setup file for Product class
+		 configuration.addResource("users.hbm.xml");
+		 
+		 // Since version 4.x, service registry is being used
+		 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().
+		 applySettings(configuration.getProperties()).build(); 
+
+		 // Create session factory instance
+		 factory = configuration.buildSessionFactory(serviceRegistry);
+
+	}
+	
+	
+	public static List<User> getAllUsers(){
+		if (factory == null)
+			setupFactory();
+		 // Get current session
+		 Session hibernateSession = factory.openSession();
+
+		 // Begin transaction
+		 hibernateSession.getTransaction().begin();
+		 
+		 //deprecated method & unsafe cast
+         List<User> users = hibernateSession.createQuery("FROM User").list(); 
+		 
+         // Commit transaction
+         hibernateSession.getTransaction().commit();
+      		 
+      	 hibernateSession.close();  
+      	System.out.println(users.size());	    
+		return users;
+		
+	}
+	
+	@RequestMapping("/login")
+	public String submitLogin(@ModelAttribute("command") User user, Model model) {
+		model.addAttribute("email", user.getEmail());
+		model.addAttribute("password", user.getPassword());
+		return "login";
+	}
+	
+	@RequestMapping("/listUsers")
+	public ModelAndView addUser(Model model) {
+		
+		return new ModelAndView("listUsers");
+		
+	}
 	@RequestMapping("/welcome")
 	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("state") String location) throws ClientProtocolException, IOException, ParseException
 	{

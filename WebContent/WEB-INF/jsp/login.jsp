@@ -12,13 +12,13 @@
 </head>
 <body>
 <h1>Log In</h1>
-	<form:form action="submitLogin.html" method="POST">
+	<form:form action="index.jsp" method="POST">
 		<table>
 			<tbody>
 				<tr>
-					<td><form:label path="username">Username:</form:label></td>
-					<td><form:input path="username"></form:input></td>
-					<td><form:errors path="username" cssClass="error"/></td>
+					<td><form:label path="email">Username:</form:label></td>
+					<td><form:input path="email"></form:input></td>
+					<td><form:errors path="email" cssClass="error"/></td>
 				</tr>
 				<tr>
 					<td><form:label path="password">Password:</form:label></td>
