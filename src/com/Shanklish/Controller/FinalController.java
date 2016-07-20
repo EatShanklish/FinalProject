@@ -1,33 +1,39 @@
 package com.Shanklish.Controller;
 
 
-import java.awt.List;
+import java.util.List;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 
-import org.apache.catalina.connector.Request;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.eclipse.jdt.internal.compiler.ast.ContinueStatement;
-import org.eclipse.jdt.internal.compiler.ast.FalseLiteral;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,13 +41,91 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class FinalController 
 {
+	
+	private static SessionFactory factory;
+
+	//--------------------------------------HIBERNATE CONFIGURATION----------------------------------
+	private static void setupFactory() 
+	{
+		try {
+				Class.forName("com.mysql.jdbc.Driver");
+			} 
+		
+		catch (Exception e) 
+		{
+			;//this is silliness!
+		}
+	    
+		 Configuration configuration = new Configuration();
+
+		 // Pass hibernate configuration file
+		 configuration.configure("hibernate.cfg.xml");
+		 
+		 // pass in setup file for Product class
+		 configuration.addResource("users.hbm.xml");
+		 
+		 // Since version 4.x, service registry is being used
+		 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().
+		 applySettings(configuration.getProperties()).build(); 
+
+		 // Create session factory instance
+		 factory = configuration.buildSessionFactory(serviceRegistry);
+
+	}
+	
+	//--------------------------------------RETRIEVES LIST OF USERS----------------------------------
+	public static List<User> getAllUsers(){
+		if (factory == null)
+			setupFactory();
+		 // Get current session
+		 Session hibernateSession = factory.openSession();
+
+		 // Begin transaction
+		 hibernateSession.getTransaction().begin();
+		 
+		 //deprecated method & unsafe cast
+         List<User> users = hibernateSession.createQuery("FROM User").list(); 
+		 
+         // Commit transaction
+         hibernateSession.getTransaction().commit();
+      		 
+      	 hibernateSession.close();  
+      	System.out.println(users.size());	    
+		return users;
+		
+	}
+	
+	
+	//--------------------------------------LOGIN CREDENTIAL HANDLER----------------------------------
+	@RequestMapping("/login")
+	public String submitLogin(@ModelAttribute("command") User user, Model model) 
+	{
+		model.addAttribute("email", user.getEmail());
+		model.addAttribute("password", user.getPassword());
+		return "login";
+	}
+	
+	
+	//-------------------------------RETRIEVES LIST OF USERS FROM DB-----------------------------------------
+	@RequestMapping("/listUsers")
+	public ModelAndView getUsers(Model model) 
+	{
+		
+		return new ModelAndView("listUsers");
+		
+	}
+
+	
+	//							addUser() METHOD WILL GO HERE. IT WILL ENCRYPT PASSWORDS AND SAVE TO DB
+	
+	//--------------------------------RETRIEVES AND DISPLAYS ALL QUERIED JOBS FROM VARIOUS APIS---------------------------------------
 	@RequestMapping("/welcome")
 	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("state") String location) throws ClientProtocolException, IOException, ParseException
 	{
 		
 		ArrayList<job> jobList = diceJobSearch(keyword,location);
 		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);
-		//ArrayList<job> usaJobList = usaJobSearch(keyword, location);
+		
 
 		
 		model.addAttribute("array",jobList);
@@ -67,23 +151,12 @@ public class FinalController
 					model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
 				}
 			
-		/*model.addAttribute("usaArray", usaJobList);
-			
-			for(int i=0; i< indeedJobList.size();i++)
-			{
-				model.addAttribute("usaJobTitle",indeedJobList.get(i).getJobTitle());
-				model.addAttribute("usaCompanyName", indeedJobList.get(i).getCompany());
-				model.addAttribute("usaLocation", indeedJobList.get(i).getLocation());
-				model.addAttribute("usaURL", indeedJobList.get(i).getLocation());
-			}*/
-			
-		
 		
 		return new ModelAndView("welcome","message","JOBS");
 	}
 	
 	
-	//Dice Job Parser - Returns ArrayList of Jobs from Dice
+	//--------------------------------------DICE JOB PARSER----------------------------------
 	@RequestMapping("dice")
 	public ArrayList<job> diceJobSearch(String pKeyword, String pLocation) throws ClientProtocolException, IOException, ParseException
 
@@ -151,7 +224,9 @@ public class FinalController
 		return diceJobArray;
 	}
 
-	//Indeed Job Parser - Returns ArrayList of Jobs from Indeed
+	
+	
+	//--------------------------------------INDEED JOB PARSER----------------------------------
 public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws ClientProtocolException, IOException, ParseException
 {
 	String keyword = pkeyword.replaceAll("\\s","+");
@@ -213,83 +288,76 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 	return indeedJobArray;	
 }
 
-/*
-public ArrayList<job> usaJobSearch(String pKeyword, String pLocation) throws ClientProtocolException, IOException, ParseException 
+
+//--------------------------------------PASSWORD ENCRYPTION----------------------------------
+private static String generateStorngPasswordHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException
 {
-	String keyword = pKeyword.replaceAll("\\s","+");
-	String location = pLocation.replaceAll("\\s","+");
-	
-	String url = "https://data.usajobs.gov/api/search?keyword="+keyword+"";
-	
-
-	HttpClient client = HttpClientBuilder.create().build();
-	
-	HttpGet request = new HttpGet(url);
-	
-	request.setHeader("Host", "data.usajobs.gov");
-	request.setHeader("User-Agent", "hussein.m.abrahim@gmail.com");
-	request.setHeader("Authorization-Key", "8xKGRy1e4ky7M/0JY75hiQWajtYZT7751NYrV7aEExI=");
-
-	HttpResponse response = client.execute(request);
-
-	
-	BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-	StringBuffer result = new StringBuffer();
-	
-	String line = "";
-	
-	while ((line = rd.readLine()) != null) {
-		result.append(line);
-	}
-    
- 
-    //------------------------------------------
-	
-	JSONParser parser = new JSONParser();
-	Object object = parser.parse(result.toString());
-	
-	JSONObject jsonObject = (JSONObject) object;
-	
-	JSONObject posts = (JSONObject)jsonObject.get("SearchResult");
-	
-	JSONArray object2 = (JSONArray) posts.get("SearchResultItems");
-	Iterator<JSONObject> iterator = object2.iterator();
-	
-	
-	//Iterator<JSONObject> iterator2 = object3.iterator();
-	
-	ArrayList<job> usaJobArray = new ArrayList<job>();
-	
-	job newjob = null;
-	
-	while(iterator.hasNext())
-	    {
-			newjob = new job();
-			
-			JSONObject job = iterator.next();
-			
-			JSONObject fuck =(JSONObject) job.get("MatchedObjectDescriptor");
-			newjob.setJobTitle((String)fuck.get("PositionTitle"));
-			newjob.setUrl((String)fuck.get("PositionURI"));		
-
-			JSONArray object3 = (JSONArray)job.get("PositionLocation");
-			JSONObject usaLocation = (JSONObject)object3.get(0);
-			String ayre = ((String)usaLocation.get("LocationName"));
-			
-			newjob.setLocation(ayre);
-			
-			newjob.setCompany((String)job.get("OrganizationName"));
-			
-			
-			usaJobArray.add(newjob);
-			
-	    }
-	
-	return usaJobArray;	
+    int iterations = 1000;
+    char[] chars = password.toCharArray();
+    byte[] salt = getSalt();
+     
+    PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
+    SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+    byte[] hash = skf.generateSecret(spec).getEncoded();
+    return iterations + ":" + toHex(salt) + ":" + toHex(hash);
 }
-*/
 
+private static byte[] getSalt() throws NoSuchAlgorithmException
+{
+    SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+    byte[] salt = new byte[16];
+    sr.nextBytes(salt);
+    return salt;
+}
+ 
+private static String toHex(byte[] array) throws NoSuchAlgorithmException
+{
+    BigInteger bi = new BigInteger(1, array);
+    String hex = bi.toString(16);
+    int paddingLength = (array.length * 2) - hex.length();
+    if(paddingLength > 0)
+    {
+        return String.format("%0"  +paddingLength + "d", 0) + hex;
+    }
+    else
+    {
+        return hex;
+    }
+}
+
+
+
+//--------------------------------------PASSWORD VALIDATION----------------------------------
+private static boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
+{
+    String[] parts = storedPassword.split(":");
+    int iterations = Integer.parseInt(parts[0]);
+    byte[] salt = fromHex(parts[1]);
+    byte[] hash = fromHex(parts[2]);
+     
+    PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), salt, iterations, hash.length * 8);
+    SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+    byte[] testHash = skf.generateSecret(spec).getEncoded();
+     
+    int diff = hash.length ^ testHash.length;
+    for(int i = 0; i < hash.length && i < testHash.length; i++)
+    {
+        diff |= hash[i] ^ testHash[i];
+    }
+    return diff == 0;
+}
+
+private static byte[] fromHex(String hex) throws NoSuchAlgorithmException
+{
+    byte[] bytes = new byte[hex.length() / 2];
+    for(int i = 0; i<bytes.length ;i++)
+    {
+        bytes[i] = (byte)Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
+    }
+    return bytes;
+}
+
+//--------------------------------------SORTING----------------------------------
 class LexicographicComparator implements Comparator<job> 
 {
     @Override

@@ -16,6 +16,7 @@
 <input type="checkbox" name="sort" value="false">Sort by City
 <input type="submit" value="Sort">
 </form>
+<a href="listUsers.html">ListUsers</a>
 
 <div>
 <h2>Jobs from Indeed</h2>
