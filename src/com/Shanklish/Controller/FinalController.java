@@ -41,7 +41,7 @@ public class FinalController
 		
 		ArrayList<job> jobList = diceJobSearch(keyword,location);
 		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);
-		ArrayList<job> usaJobList = usaJobSearch(keyword, location);
+		//ArrayList<job> usaJobList = usaJobSearch(keyword, location);
 
 		
 		model.addAttribute("array",jobList);
@@ -67,7 +67,7 @@ public class FinalController
 					model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
 				}
 			
-		model.addAttribute("usaArray", usaJobList);
+		/*model.addAttribute("usaArray", usaJobList);
 			
 			for(int i=0; i< indeedJobList.size();i++)
 			{
@@ -75,7 +75,7 @@ public class FinalController
 				model.addAttribute("usaCompanyName", indeedJobList.get(i).getCompany());
 				model.addAttribute("usaLocation", indeedJobList.get(i).getLocation());
 				model.addAttribute("usaURL", indeedJobList.get(i).getLocation());
-			}
+			}*/
 			
 		
 		
@@ -213,6 +213,7 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 	return indeedJobArray;	
 }
 
+/*
 public ArrayList<job> usaJobSearch(String pKeyword, String pLocation) throws ClientProtocolException, IOException, ParseException 
 {
 	String keyword = pKeyword.replaceAll("\\s","+");
@@ -251,25 +252,35 @@ public ArrayList<job> usaJobSearch(String pKeyword, String pLocation) throws Cli
 	JSONObject jsonObject = (JSONObject) object;
 	
 	JSONObject posts = (JSONObject)jsonObject.get("SearchResult");
-	JSONArray object2 = (JSONArray) posts.get("SearchResultItems");
 	
+	JSONArray object2 = (JSONArray) posts.get("SearchResultItems");
 	Iterator<JSONObject> iterator = object2.iterator();
+	
+	
+	//Iterator<JSONObject> iterator2 = object3.iterator();
 	
 	ArrayList<job> usaJobArray = new ArrayList<job>();
 	
-	
 	job newjob = null;
-											
+	
 	while(iterator.hasNext())
 	    {
 			newjob = new job();
 			
 			JSONObject job = iterator.next();
 			
-			newjob.setJobTitle((String)job.get("PositionTitle"));
-			newjob.setCompany((String)job.get("DepartmentName"));
-			newjob.setLocation((String)job.get("LocationName"));
-			newjob.setUrl((String)job.get("PositionURI"));
+			JSONObject fuck =(JSONObject) job.get("MatchedObjectDescriptor");
+			newjob.setJobTitle((String)fuck.get("PositionTitle"));
+			newjob.setUrl((String)fuck.get("PositionURI"));		
+
+			JSONArray object3 = (JSONArray)job.get("PositionLocation");
+			JSONObject usaLocation = (JSONObject)object3.get(0);
+			String ayre = ((String)usaLocation.get("LocationName"));
+			
+			newjob.setLocation(ayre);
+			
+			newjob.setCompany((String)job.get("OrganizationName"));
+			
 			
 			usaJobArray.add(newjob);
 			
@@ -277,6 +288,7 @@ public ArrayList<job> usaJobSearch(String pKeyword, String pLocation) throws Cli
 	
 	return usaJobArray;	
 }
+*/
 
 class LexicographicComparator implements Comparator<job> 
 {
