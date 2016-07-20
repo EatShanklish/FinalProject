@@ -9,10 +9,53 @@
 
 </head>
 <body>
+
 <h1>${message}</h1>
 
+<form action ="welcome.html">
+<input type="checkbox" name="sort" value="false">Sort by City
+<input type="submit" value="Sort">
+</form>
 
 <div>
+<h2>Jobs from Indeed</h2>
+	
+	<table>
+	    <c:forEach items="${indeedArray}" var="job">
+	        <tr>
+	            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
+	        </tr>
+	        <tr>
+	            <td><c:out value="${job.company}"/><br></td>
+	        </tr>
+	        <tr>
+	            <td><c:out value="${job.location}"/><br></td>
+	        </tr>
+	        <tr>
+	            <td>--------------------------------------------<br></td>
+	        </tr>
+	    </c:forEach>
+	</table>
+	
+	<h2>Jobs from USAJOBS</h2>
+	
+	<table>
+	    <c:forEach items="${usaArray}" var="job">
+	        <tr>
+	            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
+	        </tr>
+	        <tr>
+	            <td><c:out value="${job.company}"/><br></td>
+	        </tr>
+	        <tr>
+	            <td><c:out value="${job.location}"/><br></td>
+	        </tr>
+	        <tr>
+	            <td>--------------------------------------------<br></td>
+	        </tr>
+	    </c:forEach>
+	</table>
+	
 	<h2>Jobs from Dice</h2>
 		<table>
 		    <c:forEach items="${array}" var="job">
@@ -31,24 +74,7 @@
 		    </c:forEach>
 		</table>
 	
-	<h2>Jobs from Indeed</h2>
 	
-	<table>
-	    <c:forEach items="${indeedArray}" var="job">
-	        <tr>
-	            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
-	        </tr>
-	        <tr>
-	            <td><c:out value="${job.company}"/><br></td>
-	        </tr>
-	        <tr>
-	            <td><c:out value="${job.location}"/><br></td>
-	        </tr>
-	        <tr>
-	            <td>--------------------------------------------<br></td>
-	        </tr>
-	    </c:forEach>
-	</table>
 </div>
 
 </body>
