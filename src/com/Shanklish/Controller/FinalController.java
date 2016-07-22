@@ -410,7 +410,7 @@ public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@Reque
 	if(matched==true)											//If true, sent to homepage. If false, page reloads
 		return new ModelAndView("search", "message", "Welcome Back!");
 	else
-		return new ModelAndView("login", "message", "You do not exist on our records.");
+		return new ModelAndView(new RedirectView("login.html"));
 	
 }
 
