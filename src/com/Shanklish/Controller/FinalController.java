@@ -49,9 +49,14 @@ import com.mysql.jdbc.PreparedStatement;
 public class FinalController 
 {
 	
-	private static SessionFactory factory;
+	
+	
 
 	//--------------------------------------HIBERNATE CONFIGURATION----------------------------------
+	
+	//Driver & Factory Configuration
+	private static SessionFactory factory;
+	
 	private static void setupFactory() 
 	{
 		try {
@@ -80,10 +85,15 @@ public class FinalController
 
 	}
 	
+	
+	
 	//--------------------------------------RETRIEVES LIST OF USERS----------------------------------
+	
+	
 	public static List<User> getAllUsers(){
 		if (factory == null)
 			setupFactory();
+		
 		 // Get current session
 		 Session hibernateSession = factory.openSession();
 
@@ -96,14 +106,16 @@ public class FinalController
          // Commit transaction
          hibernateSession.getTransaction().commit();
       		 
-      	 hibernateSession.close();  
-      	System.out.println(users.size());	    
+      	 hibernateSession.close();  	  
+      	
 		return users;
 		
 	}
 	
 	
 	//--------------------------------------LOGIN CREDENTIAL HANDLER----------------------------------
+	
+	//Pipes the email & password entered by the user 
 	@RequestMapping("/login")
 	public String submitLogin(@ModelAttribute("command") User user, Model model) 
 	{
@@ -126,19 +138,20 @@ public class FinalController
 	//							addUser() METHOD WILL GO HERE. IT WILL ENCRYPT PASSWORDS AND SAVE TO DB
 	
 	
+	
 	//--------------------------------RETRIEVES AND DISPLAYS ALL QUERIED JOBS FROM VARIOUS APIS---------------------------------------
+	
 	@RequestMapping("/welcome")
 	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("state") String location) throws ClientProtocolException, IOException, ParseException
 	{
 		
-		ArrayList<job> jobList = diceJobSearch(keyword,location);
-		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);
+		ArrayList<job> jobList = diceJobSearch(keyword,location);		//Array to store jobs returned from DICE
+		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);	//Array to store jobs returned from Indeed
 		
 
+		model.addAttribute("array",jobList);				//Sends the array to welcome.jsp using JSTL
 		
-		model.addAttribute("array",jobList);
-		
-			for(int i =0; i < jobList.size(); i++)
+			for(int i =0; i < jobList.size(); i++)			//Iterates throw Dice Job Array and sends fields to welcome.jsp
 				{
 					
 					model.addAttribute("jobListCompanyName", jobList.get(i).getCompany());
@@ -149,7 +162,7 @@ public class FinalController
 				}
 			
 		
-		model.addAttribute("indeedArray", indeedJobList);
+		model.addAttribute("indeedArray", indeedJobList);		//same as above
 		
 			for(int i=0; i< indeedJobList.size();i++)
 				{
@@ -159,60 +172,63 @@ public class FinalController
 					model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
 				}
 			
-		
+		//sends user to the welcome page with a header and list of requested jobs
 		return new ModelAndView("welcome","message","Jobs matching " + keyword +" in " + location);
 	}
 	
 	
+	
 	//--------------------------------------DICE JOB PARSER----------------------------------
+	
 	@RequestMapping("dice")
 	public ArrayList<job> diceJobSearch(String pKeyword, String pLocation) throws ClientProtocolException, IOException, ParseException
 
 	{
-		String keyword = pKeyword.replaceAll("\\s","+"); //encode(String s, String enc)
+		String keyword = pKeyword.replaceAll("\\s","+"); 	//removes whitespace
 		String location = pLocation.replaceAll("\\s","+");
 		
-		String url = "http://service.dice.com/api/rest/jobsearch/v1/simple.json?text="+keyword+"&state="+location+"";
+		String url = "http://service.dice.com/api/rest/jobsearch/v1/simple.json?text="+keyword+"&state="+location+"";	//search query with userInput injection
 	
 		HttpClient client = HttpClientBuilder.create().build();
 		
 		HttpGet request = new HttpGet(url);
 		
 		
-		HttpResponse response = client.execute(request);
+		HttpResponse response = client.execute(request);		//Executes HTTP GET request
 		
-		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));	//Read content of JSON
 
 		StringBuffer result = new StringBuffer();
 		
 		String line = "";
 		
-		while ((line = rd.readLine()) != null) 
+		while ((line = rd.readLine()) != null) 			//builds one long string containing all content retrieved
 		{
 			result.append(line);
 		}
 	    
 		
 	 
-	    //------------------------------------------
+	    //------------------------------------------^Retrieving List - vParsing List--------------
 		
 		JSONParser parser = new JSONParser();
-		Object object = parser.parse(result.toString());
+		
+		Object object = parser.parse(result.toString());	//parses the content
 		
 		JSONObject jsonObject = (JSONObject) object;
 		
 		
-		JSONArray posts = (JSONArray)jsonObject.get("resultItemList");
+		JSONArray posts = (JSONArray)jsonObject.get("resultItemList");	//retrieves jsonObject which stores Job Data
 		
 		
-		Iterator<JSONObject> iterator = posts.iterator();
+		Iterator<JSONObject> iterator = posts.iterator();		//Iterates through content
 		
 		ArrayList<job> diceJobArray = new ArrayList<job>();
 		
 		
 		job newjob = null;
 												
-		while(iterator.hasNext())
+		while(iterator.hasNext())	//At each loop, a new job is created and the fields are assigned. All of which are read from JSON retrieved.
 		    {
 				newjob = new job();
 				
@@ -297,10 +313,13 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 }
 
 
+
+
 //--------------------------------------PASSWORD ENCRYPTION----------------------------------
+
 private static String generateStorngPasswordHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException
 {
-    int iterations = 1000;
+    int iterations = 1000;						//Generates a PBKDF2 Hash for passwords. Iterated 1000 times over in addition to Salt.
     char[] chars = password.toCharArray();
     byte[] salt = getSalt();
      
@@ -310,7 +329,7 @@ private static String generateStorngPasswordHash(String password) throws NoSuchA
     return iterations + ":" + toHex(salt) + ":" + toHex(hash);
 }
 
-private static byte[] getSalt() throws NoSuchAlgorithmException
+private static byte[] getSalt() throws NoSuchAlgorithmException			//Creates random string for SALTING
 {
     SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
     byte[] salt = new byte[16];
@@ -318,7 +337,7 @@ private static byte[] getSalt() throws NoSuchAlgorithmException
     return salt;
 }
  
-private static String toHex(byte[] array) throws NoSuchAlgorithmException
+private static String toHex(byte[] array) throws NoSuchAlgorithmException	//Converts String to Hexadecimals
 {
     BigInteger bi = new BigInteger(1, array);
     String hex = bi.toString(16);
@@ -340,13 +359,15 @@ private static String toHex(byte[] array) throws NoSuchAlgorithmException
 @RequestMapping("/verifyPassword")
 public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@RequestParam("email") String eMail) throws NoSuchAlgorithmException, InvalidKeySpecException
 {
-	String storedPass= getStoredPassword(eMail, pWord);
+	//Verifies the password entered by user and the password stored in DB are the same.
 	
-	boolean matched = validatePassword(pWord, storedPass);
 	
-	System.out.println(matched);
+	String storedPass= getStoredPassword(eMail, pWord);			//Retrieves password stored in DB
 	
-	if(matched==true)
+	boolean matched = validatePassword(pWord, storedPass);		//Compares the two passwords
+	
+	
+	if(matched==true)											//If true, sent to homepage. If false, page reloads
 		return new ModelAndView("welcome", "message", "welcome back BUT You should not have been redirected here. TO-DO, asshole");
 	else
 		return new ModelAndView(new RedirectView("login.html"));
@@ -366,7 +387,7 @@ public String getStoredPassword(String userEmail, String iPass)
 	 hibernateSession.getTransaction().begin();
 	 
 	 
-	 //deprecated method & unsafe cast
+	 //retrieves stored passwrd
 	 List<String> query = hibernateSession.createQuery("select password from com.Shanklish.Controller.User where email = '"+userEmail+"'").list();
 	 
 	 
@@ -384,20 +405,19 @@ public String getStoredPassword(String userEmail, String iPass)
 private static boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
 {
 	
-	System.out.println(originalPassword + " " + storedPassword);
 	
-    String[] parts = storedPassword.split(":");
-    int iterations = Integer.parseInt(parts[0]);
-    byte[] salt = fromHex(parts[1]);
+    String[] parts = storedPassword.split(":");			//Splits the hashed password up into 3 parts
+    int iterations = Integer.parseInt(parts[0]);		//Iteration is parsed into an Integer
+    byte[] salt = fromHex(parts[1]);					//Last two remaining parts are decoded from Hexadecimal notation
     byte[] hash = fromHex(parts[2]);
     
    
      
-    PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), salt, iterations, hash.length * 8);
+    PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), salt, iterations, hash.length * 8); 	//Hashes the user inputted password
     SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
     byte[] testHash = skf.generateSecret(spec).getEncoded();
      
-    int diff = hash.length ^ testHash.length;
+    int diff = hash.length ^ testHash.length;								//Compares, returns boolean
     for(int i = 0; i < hash.length && i < testHash.length; i++)
     {
         diff |= hash[i] ^ testHash[i];
@@ -405,7 +425,7 @@ private static boolean validatePassword(String originalPassword, String storedPa
     return diff == 0;
 }
 
-private static byte[] fromHex(String hex) throws NoSuchAlgorithmException
+private static byte[] fromHex(String hex) throws NoSuchAlgorithmException			//Decodes from hex
 {
     byte[] bytes = new byte[hex.length() / 2];
     for(int i = 0; i<bytes.length ;i++)
@@ -414,6 +434,8 @@ private static byte[] fromHex(String hex) throws NoSuchAlgorithmException
     }
     return bytes;
 }
+
+
 
 //--------------------------------------SORTING----------------------------------
 class LexicographicComparator implements Comparator<job> 
