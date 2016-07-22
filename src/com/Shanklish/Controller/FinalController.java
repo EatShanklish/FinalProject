@@ -28,6 +28,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.internal.StatisticalLoggingSessionEventListener;
 import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import org.json.simple.JSONArray;
@@ -126,6 +127,7 @@ public class FinalController
 	
 	
 	//-------------------------------RETRIEVES LIST OF USERS FROM DB-----------------------------------------
+	
 	@RequestMapping("/listUsers")
 	public ModelAndView getUsers(Model model) 
 	{
@@ -134,8 +136,46 @@ public class FinalController
 		
 	}
 
+	@RequestMapping("/signup")
+	public static ModelAndView showForm(@ModelAttribute("command") User user, Model model) 
+	{
+		
+		return (new ModelAndView ("SignUp"));
+	}
 	
-	//							addUser() METHOD WILL GO HERE. IT WILL ENCRYPT PASSWORDS AND SAVE TO DB
+@RequestMapping("/create")
+public static ModelAndView createUser(@RequestParam("email") String email, @RequestParam("password") String password  ) throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+        
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(generateStrongPasswordHash(password));
+        
+        addUser(user);
+        
+        return new ModelAndView("search", "message","it worked");
+        
+    }
+    
+    public static ModelAndView addUser(User u) 
+    {
+        if (factory == null)
+            setupFactory();
+         // Get current session
+         Session hibernateSession = factory.openSession();
+         // Begin transaction
+         hibernateSession.getTransaction().begin();
+         
+         //save this specific record
+         hibernateSession.save(u);  
+        
+         // Commit transaction
+         hibernateSession.getTransaction().commit();
+         
+         hibernateSession.close();  
+                    
+         return new ModelAndView("search", "message", "Account Created");  
+    }   
 	
 	
 	
@@ -145,8 +185,8 @@ public class FinalController
 	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("state") String location) throws ClientProtocolException, IOException, ParseException
 	{
 		
-		ArrayList<job> jobList = diceJobSearch(keyword,location);		//Array to store jobs returned from DICE
-		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);	//Array to store jobs returned from Indeed
+		ArrayList<job> jobList = diceJobSearch(keyword,location);				//Array to store jobs returned from DICE
+		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);		//Array to store jobs returned from Indeed
 		
 
 		model.addAttribute("array",jobList);				//Sends the array to welcome.jsp using JSTL
@@ -317,7 +357,7 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 
 //--------------------------------------PASSWORD ENCRYPTION----------------------------------
 
-private static String generateStorngPasswordHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException
+private static String generateStrongPasswordHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException
 {
     int iterations = 1000;						//Generates a PBKDF2 Hash for passwords. Iterated 1000 times over in addition to Salt.
     char[] chars = password.toCharArray();
@@ -368,9 +408,9 @@ public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@Reque
 	
 	
 	if(matched==true)											//If true, sent to homepage. If false, page reloads
-		return new ModelAndView("welcome", "message", "welcome back BUT You should not have been redirected here. TO-DO, asshole");
+		return new ModelAndView("search", "message", "Welcome Back!");
 	else
-		return new ModelAndView(new RedirectView("login.html"));
+		return new ModelAndView("login", "message", "You do not exist on our records.");
 	
 }
 
