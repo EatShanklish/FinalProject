@@ -12,18 +12,19 @@
 </head>
 <body>
 <h1>Log In</h1>
-	<form:form  method="POST">//replaced with VerifyUser method
+<h1>${message}</h1>
+	<form:form action="verifyPassword.html" method="GET">
 		<table>
 			<tbody>
 				<tr>
-					<td><form:label path="email">Username:</form:label></td>
+					<td><form:label path="email" name="email">Email:</form:label></td>
 					<td><form:input path="email"></form:input></td>
 					<td><form:errors path="email" cssClass="error"/></td>
 				</tr>
 				<tr>
-					<td><form:label path="password">Password:</form:label></td>
+					<td><form:label path="password" name ="password">Password:</form:label></td>
 					<td><form:input path="password"></form:input></td>
-					<td><form:errors path="password" cssClass="error"/></td>
+					<td><form:errors patj="password" cssClass="error"/></td>
 				</tr>
 				<tr>
 					<td colspan="2"><input type="submit" value="Submit"></td>

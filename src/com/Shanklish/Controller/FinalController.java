@@ -13,10 +13,12 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.apache.catalina.connector.Request;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -26,6 +28,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -37,6 +40,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
 
 @Controller
 public class FinalController 
@@ -118,6 +125,7 @@ public class FinalController
 	
 	//							addUser() METHOD WILL GO HERE. IT WILL ENCRYPT PASSWORDS AND SAVE TO DB
 	
+	
 	//--------------------------------RETRIEVES AND DISPLAYS ALL QUERIED JOBS FROM VARIOUS APIS---------------------------------------
 	@RequestMapping("/welcome")
 	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("state") String location) throws ClientProtocolException, IOException, ParseException
@@ -152,7 +160,7 @@ public class FinalController
 				}
 			
 		
-		return new ModelAndView("welcome","message","JOBS");
+		return new ModelAndView("welcome","message","Jobs matching " + keyword +" in " + location);
 	}
 	
 	
@@ -328,12 +336,62 @@ private static String toHex(byte[] array) throws NoSuchAlgorithmException
 
 
 //--------------------------------------PASSWORD VALIDATION----------------------------------
+
+@RequestMapping("/verifyPassword")
+public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@RequestParam("email") String eMail) throws NoSuchAlgorithmException, InvalidKeySpecException
+{
+	String storedPass= getStoredPassword(eMail, pWord);
+	
+	boolean matched = validatePassword(pWord, storedPass);
+	
+	System.out.println(matched);
+	
+	if(matched==true)
+		return new ModelAndView("welcome", "message", "welcome back BUT You should not have been redirected here. TO-DO, asshole");
+	else
+		return new ModelAndView(new RedirectView("login.html"));
+	
+}
+
+public String getStoredPassword(String userEmail, String iPass)
+{
+	 
+	if (factory == null)
+		setupFactory();
+	
+	 // Get current session
+	 Session hibernateSession = factory.openSession();
+
+	 // Begin transaction
+	 hibernateSession.getTransaction().begin();
+	 
+	 
+	 //deprecated method & unsafe cast
+	 List<String> query = hibernateSession.createQuery("select password from com.Shanklish.Controller.User where email = '"+userEmail+"'").list();
+	 
+	 
+	 String pass = query.get(0);
+	 
+	
+     // Commit transaction
+     hibernateSession.getTransaction().commit();
+  		 
+  	 hibernateSession.close();  
+  				    
+	return pass;	
+}
+
 private static boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
 {
+	
+	System.out.println(originalPassword + " " + storedPassword);
+	
     String[] parts = storedPassword.split(":");
     int iterations = Integer.parseInt(parts[0]);
     byte[] salt = fromHex(parts[1]);
     byte[] hash = fromHex(parts[2]);
+    
+   
      
     PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), salt, iterations, hash.length * 8);
     SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");

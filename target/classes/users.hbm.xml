@@ -5,8 +5,7 @@
   
  <hibernate-mapping>  
 	 <class name="com.Shanklish.Controller.User" table="users">  
-		 <id name="email" column="email" type="string">  
-		 	
+		 <id name="email" column="email" type="string">  	
 		 </id>  
 		 <property name="password" column="password" type="string"></property>  
 	 </class>      

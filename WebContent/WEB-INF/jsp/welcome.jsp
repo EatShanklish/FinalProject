@@ -33,7 +33,13 @@
 	            <td><c:out value="${job.location}"/><br></td>
 	        </tr>
 	        <tr>
+	            <td><form><input type="submit" value="Bookmark Job"></form> <br></td> <!-- Need to include action="" which points to the right controller method which will save to DB -->
+	        </tr>
+	        <tr>
 	            <td>--------------------------------------------<br></td>
+	        </tr>
+	        <tr>
+	            <td><form><input type="submit" value="Bookmark Job"></form> <br></td>
 	        </tr>
 	    </c:forEach>
 	</table>
