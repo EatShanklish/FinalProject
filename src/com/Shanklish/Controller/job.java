@@ -10,12 +10,18 @@ public class job
 	private String jobTitle;
 	private String company;
 	private String location;
-	
-	
+	private String engine;
 	private String url;
 	
 	
-	private int uID;
+	public String getEngine() {
+		return engine;
+	}
+	public void setEngine(String engine) {
+		this.engine = engine;
+	}
+	
+	
 	
 	
 	

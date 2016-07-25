@@ -96,10 +96,10 @@ public class FinalController
 	
 	
 	
-	//--------------------------------------RETRIEVES LIST OF USERS----------------------------------
+	//--------------------------------------RETRIEVES LIST OF Saved Jobs----------------------------------
 	
 	
-	public static List<User> getAllSavedJobs(){
+	public static List<User> getAllUsers(){
 		if (factory == null)
 			setupFactory();
 		
@@ -194,37 +194,16 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
 		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);		//Array to store jobs returned from Indeed
 		
 		
-		/*ArrayList<job> fulljobList = null;		//Use THIS LIST to sort the jobs by company, city and alphabetical order.
-		fulljobList.addAll(jobList);			//-------TO-DO--------------
-		fulljobList.addAll(indeedJobList);*/
+		jobList.addAll(indeedJobList);
 		
 
 		model.addAttribute("array",jobList);				//Sends the array to welcome.jsp using JSTL
 		
 		
 		
-//			for(int i =0; i < jobList.size(); i++)			//Iterates throw Dice Job Array and sends fields to welcome.jsp
-//				{
-//					
-//					model.addAttribute("jobListCompanyName", jobList.get(i).getCompany());
-//					model.addAttribute("jobListLocation", jobList.get(i).getLocation());	
-//					model.addAttribute("jobListjobTitle",jobList.get(i).getJobTitle());
-//					model.addAttribute("jobUrl", jobList.get(i).getUrl());
-//					
-//				}
-			
-		
-		model.addAttribute("indeedArray", indeedJobList);		//same as above
+		//model.addAttribute("indeedArray", indeedJobList);		//same as above
 		
 		
-//			for(int i=0; i< indeedJobList.size();i++)
-//				{
-//					model.addAttribute("indeedJobTitle",indeedJobList.get(i).getJobTitle());
-//					model.addAttribute("indeedCompanyName", indeedJobList.get(i).getCompany());
-//					model.addAttribute("indeedLocation", indeedJobList.get(i).getLocation());
-//					model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
-//				}
-			
 		//sends user to the welcome page with a header and list of requested jobs
 		return new ModelAndView("welcome","message","Jobs matching " + keyword +" in " + location);
 	}
@@ -291,6 +270,7 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
 				newjob.setCompany((String)job.get("company"));
 				newjob.setLocation((String)job.get("location"));
 				newjob.setUrl((String)job.get("detailUrl"));
+				newjob.setEngine("Dice");
 				
 				diceJobArray.add(newjob);
 				
@@ -357,7 +337,7 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 			newjob.setCompany((String)job.get("company"));
 			newjob.setLocation((String)job.get("formattedLocation"));
 			newjob.setUrl((String)job.get("url"));
-			System.out.println(newjob.getUrl());
+			newjob.setEngine("Indeed");
 			
 			indeedJobArray.add(newjob);
 			

@@ -21,42 +21,29 @@
 
 
 
-<h2>Jobs from Indeed</h2>
+<!-- <h2>Jobs from Indeed</h2> -->
 
-	<table>
-	<thead> 
-<tr> 
-    <th>JobTitle</th> 
-    <th>Company</th> 
-    <th>Location</th> 
-    <th>Bookmark?</th> 
-</tr> 
-</thead>
-	    <c:forEach items="${indeedArray}" var="job">
-	        <tr>
+<!-- 	<table> -->
+<!-- 	<thead>  -->
+<!-- <tr>  -->
+<!--     <th>JobTitle</th>  -->
+<!--     <th>Company</th>  -->
+<!--     <th>Location</th>  -->
+<!--     <th>Bookmark?</th>  -->
+<!-- </tr>  -->
+<!-- </thead> -->
+<%-- 	    <c:forEach items="${indeedArray}" var="job"> --%>
 
-	            <td><a href="<c:out value="${job.url}"/>"  target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
-	        </tr>
-	        <tr>
-	            <td><c:out value="${job.company}"/><br></td>
-	        </tr>
-	        <tr>
-	            <td><c:out value="${job.location}"/><br></td>
-	        </tr>
-	        <tr>
-	            <td>--------------------------------------------<br></td>
-	        </tr>
-	        <tr>
-	            <td><button><a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a></button> 
+<!-- 	        <tr> -->
 
-	            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a></td>
-	            <td><c:out value="${job.company}"/></td>
-	            <td><c:out value="${job.location}"/></td>
-	            <td><input type="submit" value="Bookmark Job"></td>
+<%-- 	            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a></td> --%>
+<%-- 	            <td><c:out value="${job.company}"/></td> --%>
+<%-- 	            <td><c:out value="${job.location}"/></td> --%>
+<%-- 	            <td><button><a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a></button></td> --%>
 
-	        </tr>
-	    </c:forEach>
-	</table>
+<!-- 	        </tr> -->
+<%-- 	    </c:forEach> --%>
+<!-- 	</table> -->
 
 	
 	
@@ -68,30 +55,18 @@
     <th>JobTitle</th> 
     <th>Company</th> 
     <th>Location</th> 
+    <th> Search Engine</th>
     <th>Bookmark?</th> 
+    
 </tr> 
 </thead>
 		    <c:forEach items="${array}" var="job">
 		        <tr>
-
-		            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
-		        </tr>
-		        <tr>
-		            <td><c:out value="${job.company}"/><br></td>
-		        </tr>
-		        <tr>
-		            <td><c:out value="${job.location}"/><br></td>
-		        </tr>
-	        	<tr>
-	            <td><button><a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a></button> 
-	       		 </tr>
-		        <tr>
-		            <td>--------------------------------------------<br></td>
-
 		            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a></td>
 		            <td><c:out value="${job.company}"/></td>
 		            <td><c:out value="${job.location}"/></td>
-	          	  <td><input type="submit" value="Bookmark Job"></td>
+		            <td><c:out value="${job.engine}"/></td>
+	          	  <td><button><a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a></button></td> 
 
 		        </tr>
 		    </c:forEach>
