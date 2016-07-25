@@ -5,6 +5,10 @@ import java.util.List;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,8 +39,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,8 +55,6 @@ import com.mysql.jdbc.PreparedStatement;
 @Controller
 public class FinalController 
 {
-	
-	
 	
 
 	//--------------------------------------HIBERNATE CONFIGURATION----------------------------------
@@ -83,6 +87,8 @@ public class FinalController
 
 		 // Create session factory instance
 		 factory = configuration.buildSessionFactory(serviceRegistry);
+		 
+		 
 
 	}
 	
@@ -126,20 +132,12 @@ public class FinalController
 	}
 	
 	
-	//-------------------------------RETRIEVES LIST OF USERS FROM DB-----------------------------------------
 	
-	@RequestMapping("/listUsers")
-	public ModelAndView getUsers(Model model) 
-	{
-		
-		return new ModelAndView("listUsers");
-		
-	}
-
+	//-------------------------------------------Add User Methods-----------------
+	
 	@RequestMapping("/signup")
 	public static ModelAndView showForm(@ModelAttribute("command") User user, Model model) 
-	{
-		
+	{	
 		return (new ModelAndView ("SignUp"));
 	}
 	
@@ -153,6 +151,8 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
         
         addUser(user);
         
+        user.setId(getID(email).toString());
+        
         return new ModelAndView("search", "message","it worked");
         
     }
@@ -161,8 +161,10 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
     {
         if (factory == null)
             setupFactory();
+        
          // Get current session
          Session hibernateSession = factory.openSession();
+         
          // Begin transaction
          hibernateSession.getTransaction().begin();
          
@@ -173,6 +175,7 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
          hibernateSession.getTransaction().commit();
          
          hibernateSession.close();  
+         
                     
          return new ModelAndView("search", "message", "Account Created");  
     }   
@@ -188,8 +191,15 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
 		ArrayList<job> jobList = diceJobSearch(keyword,location);				//Array to store jobs returned from DICE
 		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);		//Array to store jobs returned from Indeed
 		
+		
+		/*ArrayList<job> fulljobList = null;		//Use THIS LIST to sort the jobs by company, city and alphabetical order.
+		fulljobList.addAll(jobList);			//-------TO-DO--------------
+		fulljobList.addAll(indeedJobList);*/
+		
 
 		model.addAttribute("array",jobList);				//Sends the array to welcome.jsp using JSTL
+		
+		
 		
 			for(int i =0; i < jobList.size(); i++)			//Iterates throw Dice Job Array and sends fields to welcome.jsp
 				{
@@ -203,6 +213,7 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
 			
 		
 		model.addAttribute("indeedArray", indeedJobList);		//same as above
+		
 		
 			for(int i=0; i< indeedJobList.size();i++)
 				{
@@ -283,14 +294,13 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
 				
 		    }
 		
-		
-		
 		return diceJobArray;
 	}
 
 	
 	
 	//--------------------------------------INDEED JOB PARSER----------------------------------
+	
 public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws ClientProtocolException, IOException, ParseException
 {
 	String keyword = pkeyword.replaceAll("\\s","+");
@@ -333,7 +343,7 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 	
 	
 	job newjob = null;
-											//TO-DO - Need to make URL print alongside job.
+											
 	while(iterator.hasNext())
 	    {
 			newjob = new job();
@@ -351,6 +361,66 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 	
 	return indeedJobArray;	
 }
+
+
+
+//--------------------------Retrieve uID------------
+
+public static Integer getID(String email)
+{
+	
+	if (factory == null)
+		setupFactory();
+	
+
+ // Get current session
+ Session hibernateSession = factory.openSession();
+
+ // Begin transaction
+ hibernateSession.getTransaction().begin();
+ 
+ //deprecated method & unsafe cast
+ List <Integer> list = hibernateSession.createQuery("select id from com.Shanklish.Controller.User where email = '"+email+"'").list();
+ 
+ System.out.println(list);
+ Integer id = list.get(0);
+ System.out.println(id);
+
+ // Commit transaction
+ hibernateSession.getTransaction().commit();
+		 
+ hibernateSession.close();  	  
+	
+return id;
+}
+
+
+
+//------------------SAVE BOOKMARKED JOBS--------------------		//TO-DO: Find a way to pass both uID & url to new table in DB
+
+//@RequestMapping("/bookmarkJob")
+//public void saveJob(@RequestParam("url") String url, String uID) //@requestParam
+//{
+//	if (factory == null)
+//        setupFactory();
+//    
+//     // Get current session
+//     Session hibernateSession = factory.openSession();
+//     
+//     // Begin transaction
+//     hibernateSession.getTransaction().begin();
+//     
+//     //save this specific record
+//     hibernateSession.save(u);  
+//    
+//     // Commit transaction
+//     hibernateSession.getTransaction().commit();
+//     
+//     hibernateSession.close();  
+//     
+//                
+//     //return new ModelAndView("search", "message", "Account Created");  
+//}
 
 
 
@@ -401,14 +471,20 @@ public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@Reque
 {
 	//Verifies the password entered by user and the password stored in DB are the same.
 	
-	
+	String wtv = getID(eMail).toString();
+	System.out.println(wtv);
 	String storedPass= getStoredPassword(eMail, pWord);			//Retrieves password stored in DB
 	
 	boolean matched = validatePassword(pWord, storedPass);		//Compares the two passwords
 	
 	
 	if(matched==true)											//If true, sent to homepage. If false, page reloads
-		return new ModelAndView("search", "message", "Welcome Back!");
+		{
+		ModelAndView mView = new ModelAndView("search", "message", "Welcome Back!");
+		//mView.addObject("ID", list.get(1));
+		return mView;
+		
+		}
 	else
 		return new ModelAndView(new RedirectView("login.html"));
 	
@@ -430,10 +506,8 @@ public String getStoredPassword(String userEmail, String iPass)
 	 //retrieves stored passwrd
 	 List<String> query = hibernateSession.createQuery("select password from com.Shanklish.Controller.User where email = '"+userEmail+"'").list();
 	 
-	 
 	 String pass = query.get(0);
 	 
-	
      // Commit transaction
      hibernateSession.getTransaction().commit();
   		 

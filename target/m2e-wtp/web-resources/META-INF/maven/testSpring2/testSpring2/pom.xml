@@ -51,6 +51,8 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<artifactId>spring-web</artifactId>
 			<version>4.2.4.RELEASE</version>
 		</dependency>
+		
+		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>

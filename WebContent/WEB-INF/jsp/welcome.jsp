@@ -12,15 +12,15 @@
 
 <h1>${message}</h1>
 
-<form action ="welcome.html">
-<input type="checkbox" name="sort" value="false">Sort by City
-<input type="submit" value="Sort">
-</form>
+<!-- <form action ="welcome.html"> -->
+<!-- <input type="checkbox" name="sort" value="false">Sort by City -->
+<!-- <input type="submit" value="Sort"> -->
+<!-- </form> -->
 
 
 <div>
 <h2>Jobs from Indeed</h2>
-	
+	<form action="bookmarkJob.html">
 	<table>
 	    <c:forEach items="${indeedArray}" var="job">
 	        <tr>
@@ -33,19 +33,18 @@
 	            <td><c:out value="${job.location}"/><br></td>
 	        </tr>
 	        <tr>
-	            <td><form><input type="submit" value="Bookmark Job"></form> <br></td> <!-- Need to include action="" which points to the right controller method which will save to DB -->
-	        </tr>
-	        <tr>
 	            <td>--------------------------------------------<br></td>
 	        </tr>
 	        <tr>
-	            <td><form><input type="submit" value="Bookmark Job"></form> <br></td>
+	            <td><input type="submit" value="Bookmark Job"><br></td>
 	        </tr>
 	    </c:forEach>
 	</table>
+	</form>
 	
 	
 	<h2>Jobs from Dice</h2>
+	<form action="bookmarkJob.html">
 		<table>
 		    <c:forEach items="${array}" var="job">
 		        <tr>
@@ -58,11 +57,14 @@
 		            <td><c:out value="${job.location}"/><br></td>
 		        </tr>
 		        <tr>
+	          	  <td><input type="submit" value="Bookmark Job"><br></td>
+	        	</tr>
+		        <tr>
 		            <td>--------------------------------------------<br></td>
 		        </tr>
 		    </c:forEach>
 		</table>
-	
+	</form>
 	
 </div>
 

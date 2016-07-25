@@ -5,8 +5,9 @@
   
  <hibernate-mapping>  
 	 <class name="com.Shanklish.Controller.User" table="users">  
-		 <id name="email" column="email" type="string">  	
-		 </id>  
+		 <id name="id" column="id" type="int"> <generator class="increment"></generator></id>
+		 	
+		  <property name = "email" column="email" type="string"></property>
 		 <property name="password" column="password" type="string"></property>  
 	 </class>      
  </hibernate-mapping>  

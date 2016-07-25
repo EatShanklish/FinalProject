@@ -1,11 +1,21 @@
 package com.Shanklish.Controller;
 
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+
 public class job 
 {
+	
 	private String jobTitle;
 	private String company;
 	private String location;
+	
+	
 	private String url;
+	
+	
+	private int uID;
 	
 	
 	

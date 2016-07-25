@@ -67,7 +67,7 @@
 	<option value="WI">WI</option>
 	<option value="WY">WY</option>
 </select>
-  
+  <input type="hidden" value ="${ID}" name="currentUserID"/>
   <input type="submit" value="Submit">
 </form>
 </body>
