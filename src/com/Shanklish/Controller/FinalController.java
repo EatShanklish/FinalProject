@@ -99,7 +99,7 @@ public class FinalController
 	//--------------------------------------RETRIEVES LIST OF USERS----------------------------------
 	
 	
-	public static List<User> getAllUsers(){
+	public static List<User> getAllSavedJobs(){
 		if (factory == null)
 			setupFactory();
 		
