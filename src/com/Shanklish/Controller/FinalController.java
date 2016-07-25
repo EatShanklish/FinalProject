@@ -81,6 +81,8 @@ public class FinalController
 		 // pass in setup file for Product class
 		 configuration.addResource("users.hbm.xml");
 		 
+		 configuration.addResource("bookmarkedjob.hbm.xml");
+		 
 		 // Since version 4.x, service registry is being used
 		 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().
 		 applySettings(configuration.getProperties()).build(); 
@@ -151,7 +153,7 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
         
         addUser(user);
         
-        user.setId(getID(email).toString());
+        user.setId(getID(email));
         
         return new ModelAndView("search", "message","it worked");
         
@@ -201,27 +203,27 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
 		
 		
 		
-			for(int i =0; i < jobList.size(); i++)			//Iterates throw Dice Job Array and sends fields to welcome.jsp
-				{
-					
-					model.addAttribute("jobListCompanyName", jobList.get(i).getCompany());
-					model.addAttribute("jobListLocation", jobList.get(i).getLocation());	
-					model.addAttribute("jobListjobTitle",jobList.get(i).getJobTitle());
-					model.addAttribute("jobUrl", jobList.get(i).getUrl());
-					
-				}
+//			for(int i =0; i < jobList.size(); i++)			//Iterates throw Dice Job Array and sends fields to welcome.jsp
+//				{
+//					
+//					model.addAttribute("jobListCompanyName", jobList.get(i).getCompany());
+//					model.addAttribute("jobListLocation", jobList.get(i).getLocation());	
+//					model.addAttribute("jobListjobTitle",jobList.get(i).getJobTitle());
+//					model.addAttribute("jobUrl", jobList.get(i).getUrl());
+//					
+//				}
 			
 		
 		model.addAttribute("indeedArray", indeedJobList);		//same as above
 		
 		
-			for(int i=0; i< indeedJobList.size();i++)
-				{
-					model.addAttribute("indeedJobTitle",indeedJobList.get(i).getJobTitle());
-					model.addAttribute("indeedCompanyName", indeedJobList.get(i).getCompany());
-					model.addAttribute("indeedLocation", indeedJobList.get(i).getLocation());
-					model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
-				}
+//			for(int i=0; i< indeedJobList.size();i++)
+//				{
+//					model.addAttribute("indeedJobTitle",indeedJobList.get(i).getJobTitle());
+//					model.addAttribute("indeedCompanyName", indeedJobList.get(i).getCompany());
+//					model.addAttribute("indeedLocation", indeedJobList.get(i).getLocation());
+//					model.addAttribute("indeedURL", indeedJobList.get(i).getLocation());
+//				}
 			
 		//sends user to the welcome page with a header and list of requested jobs
 		return new ModelAndView("welcome","message","Jobs matching " + keyword +" in " + location);
@@ -331,6 +333,7 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 	JSONParser parser = new JSONParser();
 	Object object = parser.parse(result.toString());
 	
+	
 	JSONObject jsonObject = (JSONObject) object;
 	
 	
@@ -354,6 +357,7 @@ public ArrayList<job> indeedJobSearch(String pkeyword, String plocation) throws 
 			newjob.setCompany((String)job.get("company"));
 			newjob.setLocation((String)job.get("formattedLocation"));
 			newjob.setUrl((String)job.get("url"));
+			System.out.println(newjob.getUrl());
 			
 			indeedJobArray.add(newjob);
 			
@@ -396,31 +400,40 @@ return id;
 
 
 
+
 //------------------SAVE BOOKMARKED JOBS--------------------		//TO-DO: Find a way to pass both uID & url to new table in DB
 
-//@RequestMapping("/bookmarkJob")
-//public void saveJob(@RequestParam("url") String url, String uID) //@requestParam
-//{
-//	if (factory == null)
-//        setupFactory();
-//    
-//     // Get current session
-//     Session hibernateSession = factory.openSession();
-//     
-//     // Begin transaction
-//     hibernateSession.getTransaction().begin();
-//     
-//     //save this specific record
-//     hibernateSession.save(u);  
-//    
-//     // Commit transaction
-//     hibernateSession.getTransaction().commit();
-//     
-//     hibernateSession.close();  
-//     
-//                
-//     //return new ModelAndView("search", "message", "Account Created");  
-//}
+@RequestMapping("/bookmarkJob")
+public ModelAndView saveJob(@RequestParam("url") String url, HttpServletRequest request) //@requestParam
+{
+	BookmarkedJob bJob = new BookmarkedJob();
+	
+	bJob.setUrl(url);
+	bJob.setuID((int) request.getSession().getAttribute("uID"));
+	System.out.println(bJob.getUrl());
+	System.out.println(bJob.getuID());
+	
+	if (factory == null)
+       setupFactory();
+  
+     // Get current session
+     Session hibernateSession = factory.openSession();
+     
+    // Begin transaction
+    hibernateSession.getTransaction().begin();
+    
+     //save this specific record
+     hibernateSession.save(bJob);  
+    
+     // Commit transaction
+     hibernateSession.getTransaction().commit();
+     
+     hibernateSession.close();  
+     
+     return new ModelAndView("search");
+    
+                
+}
 
 
 
@@ -467,12 +480,15 @@ private static String toHex(byte[] array) throws NoSuchAlgorithmException	//Conv
 //--------------------------------------PASSWORD VALIDATION----------------------------------
 
 @RequestMapping("/verifyPassword")
-public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@RequestParam("email") String eMail) throws NoSuchAlgorithmException, InvalidKeySpecException
+public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@RequestParam("email") String eMail,HttpServletRequest request) throws NoSuchAlgorithmException, InvalidKeySpecException
 {
 	//Verifies the password entered by user and the password stored in DB are the same.
+	request.getSession().setAttribute("email", eMail);
+	request.getSession().setAttribute("uID", getID(eMail));
 	
 	String wtv = getID(eMail).toString();
 	System.out.println(wtv);
+	
 	String storedPass= getStoredPassword(eMail, pWord);			//Retrieves password stored in DB
 	
 	boolean matched = validatePassword(pWord, storedPass);		//Compares the two passwords
@@ -480,6 +496,7 @@ public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@Reque
 	
 	if(matched==true)											//If true, sent to homepage. If false, page reloads
 		{
+		
 		ModelAndView mView = new ModelAndView("search", "message", "Welcome Back!");
 		//mView.addObject("ID", list.get(1));
 		return mView;

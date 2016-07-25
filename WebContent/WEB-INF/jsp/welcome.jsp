@@ -18,13 +18,13 @@
 <!-- </form> -->
 
 
-<div>
+
 <h2>Jobs from Indeed</h2>
-	<form action="bookmarkJob.html">
+
 	<table>
 	    <c:forEach items="${indeedArray}" var="job">
 	        <tr>
-	            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
+	            <td><a href="<c:out value="${job.url}"/>"  target="_blank"><c:out value="${job.jobTitle}"/></a><br></td>
 	        </tr>
 	        <tr>
 	            <td><c:out value="${job.company}"/><br></td>
@@ -36,15 +36,15 @@
 	            <td>--------------------------------------------<br></td>
 	        </tr>
 	        <tr>
-	            <td><input type="submit" value="Bookmark Job"><br></td>
+	            <td><button><a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a></button> 
 	        </tr>
 	    </c:forEach>
 	</table>
-	</form>
+
 	
 	
 	<h2>Jobs from Dice</h2>
-	<form action="bookmarkJob.html">
+	
 		<table>
 		    <c:forEach items="${array}" var="job">
 		        <tr>
@@ -56,17 +56,17 @@
 		        <tr>
 		            <td><c:out value="${job.location}"/><br></td>
 		        </tr>
-		        <tr>
-	          	  <td><input type="submit" value="Bookmark Job"><br></td>
-	        	</tr>
+	        	<tr>
+	            <td><button><a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a></button> 
+	       		 </tr>
 		        <tr>
 		            <td>--------------------------------------------<br></td>
 		        </tr>
 		    </c:forEach>
 		</table>
-	</form>
 	
-</div>
+	
+
 
 </body>
 </html>

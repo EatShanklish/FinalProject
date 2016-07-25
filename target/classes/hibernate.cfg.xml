@@ -21,7 +21,7 @@
 
 	    
 	    <mapping class="com.Shanklish.Controller.User"/>
-	    <mapping class="com.Shanklish.Controller.job"/>
+	    <mapping class="com.Shanklish.Controller.BookmarkedJob"/>
 	    
 	
 	    
