@@ -5,8 +5,15 @@ public class BookmarkedJob
 	private String url;
 	private int uID;
 	private int id;
+	private String JobTitle;
 	
 	
+	public String getJobTitle() {
+		return JobTitle;
+	}
+	public void setJobTitle(String jobTitle) {
+		JobTitle = jobTitle;
+	}
 	public int getId() {
 		return id;
 	}

@@ -28,6 +28,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HTTP;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -89,9 +90,6 @@ public class FinalController
 
 		 // Create session factory instance
 		 factory = configuration.buildSessionFactory(serviceRegistry);
-		 
-		 
-
 	}
 	
 	
@@ -99,7 +97,8 @@ public class FinalController
 	//--------------------------------------RETRIEVES LIST OF Saved Jobs----------------------------------
 	
 	
-	public static List<User> getAllUsers(){
+	public static List<job> getAllSavedJobs(String uID)
+	{
 		if (factory == null)
 			setupFactory();
 		
@@ -110,17 +109,15 @@ public class FinalController
 		 hibernateSession.getTransaction().begin();
 		 
 		 //deprecated method & unsafe cast
-         List<User> users = hibernateSession.createQuery("FROM User").list(); 
-		 
+         List<job> urls = hibernateSession.createQuery("from com.Shanklish.Controller.BookmarkedJob WHERE uID = '"+ uID +"'").list(); 
+         
          // Commit transaction
          hibernateSession.getTransaction().commit();
       		 
-      	 hibernateSession.close();  	  
-      	
-		return users;
-		
+      	 hibernateSession.close();
+      	       	
+		return urls;	//Return arraylist of URLS
 	}
-	
 	
 	//--------------------------------------LOGIN CREDENTIAL HANDLER----------------------------------
 	
@@ -151,7 +148,7 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
         user.setEmail(email);
         user.setPassword(generateStrongPasswordHash(password));
         
-        addUser(user);
+        addUser(user);		//stores them into DB
         
         user.setId(getID(email));
         
@@ -187,21 +184,20 @@ public static ModelAndView createUser(@RequestParam("email") String email, @Requ
 	//--------------------------------RETRIEVES AND DISPLAYS ALL QUERIED JOBS FROM VARIOUS APIS---------------------------------------
 	
 	@RequestMapping("/welcome")
-	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("state") String location) throws ClientProtocolException, IOException, ParseException
+	public ModelAndView helloWorld(Model model,@RequestParam("query") String keyword,@RequestParam("state") String location, HttpServletRequest request) throws ClientProtocolException, IOException, ParseException
 	{
 		
 		ArrayList<job> jobList = diceJobSearch(keyword,location);				//Array to store jobs returned from DICE
 		ArrayList<job> indeedJobList = indeedJobSearch(keyword,location);		//Array to store jobs returned from Indeed
 		
-		
-		jobList.addAll(indeedJobList);
-		
+		jobList.addAll(indeedJobList);											//Combining the two arrays into one.
 
+		List<job> bookmarks = getAllSavedJobs(request.getSession().getAttribute("uID").toString());
+		
+		model.addAttribute("bookmarkArray", bookmarks);
+		
 		model.addAttribute("array",jobList);				//Sends the array to welcome.jsp using JSTL
-		
-		
-		
-		//model.addAttribute("indeedArray", indeedJobList);		//same as above
+		model.addAttribute("userID", request.getSession().getAttribute("uID").toString());
 		
 		
 		//sends user to the welcome page with a header and list of requested jobs
@@ -368,7 +364,7 @@ public static Integer getID(String email)
  
  System.out.println(list);
  Integer id = list.get(0);
- System.out.println(id);
+ 
 
  // Commit transaction
  hibernateSession.getTransaction().commit();
@@ -381,17 +377,18 @@ return id;
 
 
 
-//------------------SAVE BOOKMARKED JOBS--------------------		//TO-DO: Find a way to pass both uID & url to new table in DB
+//------------------SAVE BOOKMARKED JOBS--------------------		
 
 @RequestMapping("/bookmarkJob")
-public ModelAndView saveJob(@RequestParam("url") String url, HttpServletRequest request) //@requestParam
+public ModelAndView saveJob(@RequestParam("url") String url, @RequestParam("title") String title, HttpServletRequest request, Model model) //@requestParam
 {
 	BookmarkedJob bJob = new BookmarkedJob();
 	
+	
 	bJob.setUrl(url);
+	bJob.setJobTitle(title);
 	bJob.setuID((int) request.getSession().getAttribute("uID"));
-	System.out.println(bJob.getUrl());
-	System.out.println(bJob.getuID());
+	
 	
 	if (factory == null)
        setupFactory();
@@ -409,6 +406,8 @@ public ModelAndView saveJob(@RequestParam("url") String url, HttpServletRequest 
      hibernateSession.getTransaction().commit();
      
      hibernateSession.close();  
+     
+    
      
      return new ModelAndView("search");
     
@@ -465,6 +464,7 @@ public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@Reque
 	//Verifies the password entered by user and the password stored in DB are the same.
 	request.getSession().setAttribute("email", eMail);
 	request.getSession().setAttribute("uID", getID(eMail));
+	request.getSession().setMaxInactiveInterval(-1);
 	
 	String wtv = getID(eMail).toString();
 	System.out.println(wtv);
@@ -478,7 +478,6 @@ public ModelAndView VerifyPassword(@RequestParam("password") String pWord,@Reque
 		{
 		
 		ModelAndView mView = new ModelAndView("search", "message", "Welcome Back!");
-		//mView.addObject("ID", list.get(1));
 		return mView;
 		
 		}

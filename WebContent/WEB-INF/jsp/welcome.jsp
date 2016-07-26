@@ -4,50 +4,36 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <head>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="jquery-3.1.0.min.js"></script>
+<script src="bootstrapJS/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery-latest.js"></script>
 <script type="text/javascript" src="jquery.tablesorter.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Jobs and Whatnot</title>
+
+<title>Need a Job?</title>
 
 </head>
 <body>
 
+<div class="container">
+  <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Saved Jobs
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+    
+    <c:forEach items="${bookmarkArray}" var="job">
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><a href='"<c:out value="${job.url}" />"' target="_blank"><c:out value="${job.jobTitle}"/></a></li>
+      </c:forEach>
+      
+    </ul>
+  </div>
+</div>
+
+
 	<h1>${message}</h1>
-
-	<!-- <form action ="welcome.html"> -->
-	<!-- <input type="checkbox" name="sort" value="false">Sort by City -->
-	<!-- <input type="submit" value="Sort"> -->
-	<!-- </form> -->
-
-
-
-	<!-- <h2>Jobs from Indeed</h2> -->
-
-	<!-- 	<table> -->
-	<!-- 	<thead>  -->
-	<!-- <tr>  -->
-	<!--     <th>JobTitle</th>  -->
-	<!--     <th>Company</th>  -->
-	<!--     <th>Location</th>  -->
-	<!--     <th>Bookmark?</th>  -->
-	<!-- </tr>  -->
-	<!-- </thead> -->
-	<%-- 	    <c:forEach items="${indeedArray}" var="job"> --%>
-
-	<!-- 	        <tr> -->
-
-	<%-- 	            <td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}"/></a></td> --%>
-	<%-- 	            <td><c:out value="${job.company}"/></td> --%>
-	<%-- 	            <td><c:out value="${job.location}"/></td> --%>
-	<%-- 	            <td><button><a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a></button></td> --%>
-
-	<!-- 	        </tr> -->
-	<%-- 	    </c:forEach> --%>
-	<!-- 	</table> -->
-
-
-
-	<h2>Jobs from Dice</h2>
+	
+	
 
 	<table id="myTable" class="tablesorter">
 		<thead>
@@ -56,21 +42,18 @@
 				<th>Company</th>
 				<th>Location</th>
 				<th>Search Engine</th>
-				<th>Bookmark?</th>
+				<th>Bookmark</th>
 
 			</tr>
 		</thead>
 		<tbody>
 			<c:forEach items="${array}" var="job">
 				<tr>
-					<td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out
-								value="${job.jobTitle}" /></a></td>
+					<td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}" /></a></td>
 					<td><c:out value="${job.company}" /></td>
 					<td><c:out value="${job.location}" /></td>
 					<td><c:out value="${job.engine}" /></td>
-					<td><button>
-							<a href='bookmarkJob.html?url="${job.url}"'>Bookmark Job</a>
-						</button></td>
+					<td><button><a href='bookmarkJob.html?url="${job.url}"&title="${job.jobTitle}"'>Bookmark Job</a></button></td>
 
 				</tr>
 			</c:forEach>
