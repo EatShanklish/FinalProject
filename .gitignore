@@ -2,8 +2,8 @@
 .classpath
 .project
 .settings/
-FinalController.java
-hibernate.cfg.xml
+*/FinalController.java
+*/hibernate.cfg.xml
 # Intellij
 .idea/
 *.iml
