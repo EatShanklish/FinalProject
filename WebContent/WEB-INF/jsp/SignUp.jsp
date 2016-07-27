@@ -19,9 +19,9 @@
 					<td><form:errors path="email" cssClass="error"/></td>
 				</tr>
 				<tr>
-					<td><form:label path="password" name="password">Password:</form:label></td>
-					<td><form:input path="password"></form:input></td>
-					<td><form:errors path="password" cssClass="error"/></td>
+					<td><form:label type ="password" path="password" name="password">Password:</form:label></td>
+					<td><form:input path="password" type ="password"></form:input></td>
+					<td><form:errors path="password" type ="password" cssClass="error"/></td>
 				</tr>
 				<tr>
 					<td colspan="2"><input type="submit" value="Submit"></td>

@@ -6,13 +6,29 @@
 <head>
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <script src="jquery-3.1.0.min.js"></script>
+<script src="notify.js"></script>
 <script src="bootstrapJS/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery-latest.js"></script>
 <script type="text/javascript" src="jquery.tablesorter.js"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
 <title>Need a Job?</title>
-
+<script>
+function addBullet( addUrl,  addTitle) 
+{
+	  var ul = document.getElementById("BMlist");
+ 	  var li = document.createElement("li");
+ 	  var newlink = document.createElement("a");
+ 	  var linktext = document.createTextNode(addTitle);
+ 	  newlink.appendChild(linktext);
+ 	  newlink.href=addUrl;
+ 	  
+ 	  li.appendChild(newlink);
+ 	  ul.appendChild(li);
+	  $.notify(addTitle,'success');
+	  return true;
+	}
+</script>
 </head>
 <body>
 
@@ -20,16 +36,17 @@
   <div class="dropdown">
     <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Saved Jobs
     <span class="caret"></span></button>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+    <ul id="BMlist" class="dropdown-menu" role="menu" aria-labelledby="menu1">
     
     <c:forEach items="${bookmarkArray}" var="job">
-      <li role="presentation"><a role="menuitem" tabindex="-1" href="#"><a href='"<c:out value="${job.url}" />"' target="_blank"><c:out value="${job.jobTitle}"/></a></li>
+      <li><a href="${job.url}" target="_blank">${job.jobTitle}</a></li>
       </c:forEach>
       
     </ul>
   </div>
 </div>
 
+<iframe name="resultframe" width="1" height="1" ></iframe>
 
 	<h1>${message}</h1>
 	
@@ -49,11 +66,11 @@
 		<tbody>
 			<c:forEach items="${array}" var="job">
 				<tr>
-					<td><a href="<c:out value="${job.url}"/>" target="_blank"><c:out value="${job.jobTitle}" /></a></td>
+					<td><a href="${job.url}" target="_blank"><c:out value="${job.jobTitle}" /></a></td>
 					<td><c:out value="${job.company}" /></td>
 					<td><c:out value="${job.location}" /></td>
 					<td><c:out value="${job.engine}" /></td>
-					<td><button><a href='bookmarkJob.html?url="${job.url}"&title="${job.jobTitle}"'>Bookmark Job</a></button></td>
+					<td><button><a href='bookmarkJob.html?url=${job.url}&title=${job.jobTitle}' target="resultframe" onclick="return addBullet('${job.url}', '${job.jobTitle}')">Bookmark Job</a></button></td>
 
 				</tr>
 			</c:forEach>
