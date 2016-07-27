@@ -25,7 +25,7 @@ function addBullet( addUrl,  addTitle)
  	  
  	  li.appendChild(newlink);
  	  ul.appendChild(li);
-	  $.notify(addTitle,'success');
+	  
 	  return true;
 	}
 </script>

@@ -13,7 +13,7 @@
 <body>
 <h1>Log In</h1>
 <h1>${message}</h1>
-	<form:form action="verifyPassword.html" method="GET">
+	<form:form action="verifyPassword.html" method="POST">
 		<table>
 			<tbody>
 				<tr>
