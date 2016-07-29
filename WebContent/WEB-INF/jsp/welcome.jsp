@@ -17,6 +17,7 @@
 
 <title>Need a Job?</title>
 <script>
+<<<<<<< HEAD
 	function addBullet(addUrl, addTitle) {
 		var ul = document.getElementById("BMlist");
 		var li = document.createElement("li");
@@ -29,6 +30,21 @@
 		ul.appendChild(li);
 		$.notify(addTitle, 'success');
 		return true;
+=======
+function addBullet( addUrl,  addTitle) 
+{
+	  var ul = document.getElementById("BMlist");
+ 	  var li = document.createElement("li");
+ 	  var newlink = document.createElement("a");
+ 	  var linktext = document.createTextNode(addTitle);
+ 	  newlink.appendChild(linktext);
+ 	  newlink.href=addUrl;
+ 	  
+ 	  li.appendChild(newlink);
+ 	  ul.appendChild(li);
+	  
+	  return true;
+>>>>>>> origin
 	}
 </script>
 </head>
