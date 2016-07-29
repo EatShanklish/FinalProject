@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="css/welcome.css">
 <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 <script src="jquery-3.1.0.min.js"></script>
-<script src="notify.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery-latest.js"></script>
 <script type="text/javascript" src="jquery.tablesorter.js"></script>
@@ -17,7 +16,6 @@
 
 <title>Need a Job?</title>
 <script>
-<<<<<<< HEAD
 	function addBullet(addUrl, addTitle) {
 		var ul = document.getElementById("BMlist");
 		var li = document.createElement("li");
@@ -28,23 +26,7 @@
 
 		li.appendChild(newlink);
 		ul.appendChild(li);
-		$.notify(addTitle, 'success');
 		return true;
-=======
-function addBullet( addUrl,  addTitle) 
-{
-	  var ul = document.getElementById("BMlist");
- 	  var li = document.createElement("li");
- 	  var newlink = document.createElement("a");
- 	  var linktext = document.createTextNode(addTitle);
- 	  newlink.appendChild(linktext);
- 	  newlink.href=addUrl;
- 	  
- 	  li.appendChild(newlink);
- 	  ul.appendChild(li);
-	  
-	  return true;
->>>>>>> origin
 	}
 </script>
 </head>

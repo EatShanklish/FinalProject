@@ -22,7 +22,6 @@
 <title>Log In</title>
 </head>
 <body>
-<<<<<<< HEAD
 
 	<nav class="navbar navbar-default" role="navigation">
 	<div class="container"> <!-- Trying to center these things up top! -->
@@ -99,34 +98,5 @@
 			</div>
 		</div>
 	</div>
-
-
-
-
-
-
-=======
-<h1>Log In</h1>
-<h1>${message}</h1>
-	<form:form action="verifyPassword.html" method="POST">
-		<table>
-			<tbody>
-				<tr>
-					<td><form:label path="email" name="email">Email:</form:label></td>
-					<td><form:input path="email"></form:input></td>
-					<td><form:errors path="email" cssClass="error"/></td>
-				</tr>
-				<tr>
-					<td><form:label type="password" path="password" name ="password">Password:</form:label></td>
-					<td><form:input path="password" type="password"></form:input></td>
-					<td><form:errors path="password"  type="password" cssClass="error"/></td>
-				</tr>
-				<tr>
-					<td colspan="2"><input type="submit" value="Submit"></td>
-				</tr>
-			</tbody>
-		</table>
-	</form:form>
->>>>>>> origin
 </body>
 </html>
