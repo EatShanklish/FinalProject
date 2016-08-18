@@ -28,6 +28,7 @@
 		ul.appendChild(li);
 		return true;
 	}
+
 </script>
 </head>
 <body>
@@ -62,18 +63,6 @@
 	</div>
 	</nav>
 
-
-
-
-
-
-
-
-
-
-
-
-
 	<div class="container">
 		<div class="row">
 
@@ -81,8 +70,8 @@
 				<thead>
 					<tr>
 						<th><center>Job Title</center></th>
-						<th><center>Company</center></th>
-						<th><center>Location</center></th>
+						<th><center>Company<span><img class="upDown" src="images/upDown.png"></img></span></center></th>
+						<th><center>Location<span><img class="upDown" src="images/upDown.png"></img></span></center></th>
 						<th><center>Search Engine</center></th>
 						<th><center>Bookmark</center></th>
 
@@ -91,9 +80,9 @@
 				<tbody>
 					<c:forEach items="${array}" var="job">
 						<tr>
-							<td><a href="${job.url}" target="_blank"><c:out
+							<td id="white"><a href="${job.url}" target="_blank"><c:out
 										value="${job.jobTitle}" /></a></td>
-							<td><c:out value="${job.company}" /></td>
+							<td ><c:out value="${job.company}" /></td>
 							<td><c:out value="${job.location}" /></td>
 							<td><c:out value="${job.engine}" /></td>
 							<td><a class="btn btn-warning"
